@@ -1,0 +1,580 @@
+openapi: 3.0.0
+info:
+  version: '1.0.0'
+  title: 'home_assistant'
+#  license:
+#    name: MIT
+servers:
+  - url: 'http://localhost/api'
+paths:
+  /user:
+    get:
+      security:
+        - bearerAuth: [ ]
+      summary: 'Returns details about a particular user'
+      operationId: GetUser
+      tags:
+        - user
+      responses:
+        '200':
+          description: 'Details about a current user'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default: true
+                  response:
+                    type: object
+                    properties:
+                      user:
+                        $ref: '#/components/schemas/UserResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /user/auth:
+    post:
+      summary: 'Authorize or register user by email and password'
+      operationId: Authorize
+      tags:
+        - user
+      parameters:
+        - name: email
+          in: query
+          description: Email address
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: Password
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Result of authorization with token'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /user/auth_with_google:
+    post:
+      summary: 'Authorize or register user by google token'
+      operationId: AuthorizeWithGoogle
+      tags:
+        - user
+      parameters:
+        - name: token
+          in: query
+          description: Google id token
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Result of authorization with token'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /user/edit_profile:
+    patch:
+      security:
+        - bearerAuth: [ ]
+      summary: 'Change login or password of current user profile'
+      operationId: EditProfile
+      tags:
+        - user
+      parameters:
+        - name: login
+          in: query
+          description: Login
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: Password
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Success message'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmptySuccessResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /user/logout:
+    delete:
+      security:
+        - bearerAuth: [ ]
+      summary: 'Logout current user'
+      operationId: Logout
+      tags:
+        - user
+      responses:
+        '200':
+          description: 'Success message'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmptySuccessResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /note/add:
+    post:
+      security:
+        - bearerAuth: [ ]
+      summary: 'Add new note'
+      operationId: AddNote
+      tags:
+        - note
+      parameters:
+        - name: title
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: link
+          in: query
+          schema:
+            type: string
+        - name: comment
+          in: query
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Success message'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmptySuccessResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /note/update:
+    patch:
+      security:
+        - bearerAuth: [ ]
+      summary: 'Update existing note'
+      operationId: UpdateNote
+      tags:
+        - note
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: title
+          in: query
+          schema:
+            type: string
+        - name: link
+          in: query
+          schema:
+            type: string
+        - name: comment
+          in: query
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Success message'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmptySuccessResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /note/get_note:
+    get:
+      security:
+        - bearerAuth: [ ]
+      summary: 'Get existing note by id'
+      operationId: GetNote
+      tags:
+        - note
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Note'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoteResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /note/get_notes:
+    get:
+      security:
+        - bearerAuth: [ ]
+      summary: 'Get existing notes by request params'
+      operationId: GetNotes
+      tags:
+        - note
+      parameters:
+        - name: filter
+          in: query
+          description: 'List of parameters {"key": "value"}'
+          schema:
+            type: object
+        - name: sort
+          in: query
+          schema:
+            $ref: '#/components/schemas/SortParam'
+        - name: pagination
+          in: query
+          schema:
+            $ref: '#/components/schemas/PaginationParam'
+      responses:
+        200:
+          description: 'List of notes'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default: true
+                  response:
+                    type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Note'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /note/get_random:
+    get:
+      security:
+        - bearerAuth: [ ]
+      summary: 'Get existing random note'
+      operationId: GetRandomNote
+      tags:
+        - note
+      responses:
+        200:
+          description: 'Note'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoteResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /note/read:
+    patch:
+      security:
+        - bearerAuth: [ ]
+      summary: 'Mark created note as read'
+      operationId: ReadNote
+      tags:
+        - note
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Success message'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmptySuccessResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /note/finish:
+    patch:
+      security:
+        - bearerAuth: [ ]
+      summary: 'Mark read note as finished'
+      operationId: FinishNote
+      tags:
+        - note
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Success message'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmptySuccessResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /note/return_to_not_read:
+    patch:
+      security:
+        - bearerAuth: [ ]
+      summary: 'Mark read note as created'
+      operationId: ReturnNoteToNotRead
+      tags:
+        - note
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Success message'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmptySuccessResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+
+components:
+  schemas:
+    UserResponse:
+      type: object
+      properties:
+        created_at:
+          type: string
+          description: 'Дата создания'
+        login:
+          type: string
+          description: 'Имя пользователя'
+        email:
+          type: string
+          description: 'Email пользователя'
+
+    AuthResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: true
+        response:
+          type: object
+          properties:
+            token:
+              type: string
+
+    NoteResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: true
+        response:
+          $ref: '#/components/schemas/Note'
+
+    Note:
+      type: object
+      properties:
+        id:
+          type: integer
+        created_at:
+          type: string
+        updated_at:
+          type: string
+        title:
+          type: string
+        link:
+          type: string
+        comment:
+          type: string
+        status:
+          type: string
+
+    EmptySuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: true
+
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: false
+        response:
+          type: object
+          properties:
+            error:
+              type: string
+
+    UnauthorizedError:
+      type: object
+      properties:
+        message:
+          type: string
+          default: 'Unauthorized'
+
+    SortParam:
+      type: object
+      properties:
+        field:
+          type: string
+        order:
+          type: string
+
+    PaginationParam:
+      type: object
+      properties:
+        limit:
+          type: integer
+        page:
+          type: integer
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+
